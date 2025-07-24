@@ -3,6 +3,83 @@ const searchButton = document.getElementById('searchButton');
 const searchInput = document.getElementById('searchInput');
 const confirmation = document.getElementById('confirmation');
 
+async function makeRequest(book, ref) {
+  const output = []; // result object to store results
+
+  if (ref.length !== 1 && ref.length !== 3) {
+    return output; // return empty if format is wrong
+  }
+
+  const user_input_1 = ref[0];
+  let user_input_2, user_input_3;
+  const without_refs = ref.length === 1;
+
+  if (!without_refs) {
+    user_input_2 = parseInt(ref[1], 10);
+    user_input_3 = parseInt(ref[2], 10);
+  }
+
+  const url = `https://www.aelf.org/bible/${book}/${user_input_1}`;
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      output.error = `Failed to retrieve content. Status code: ${response.status}`;
+      return output;
+    }
+
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const text = doc.body.textContent || '';
+
+    // Split and group lines
+    const lines = text.split('\n');
+    const sections = [];
+    let currentSection = [];
+
+    for (const line of lines) {
+      const stripped = line.trim();
+      if (stripped) {
+        currentSection.push(stripped);
+      } else if (currentSection.length > 0) {
+        sections.push(currentSection);
+        currentSection = [];
+      }
+    }
+    if (currentSection.length > 0) {
+      sections.push(currentSection);
+    }
+
+    const section = sections[sections.length - 2] || [];
+    const matchingLines = [];
+
+    if (without_refs) {
+      for (let i = 0; i < section.length; i++) {
+        const parts = section[i].trim().split(' ', 2);
+        if (parts.length < 2 || i === 0) continue;
+        matchingLines.push(parts[1]);
+      }
+    } else {
+      for (const line of section) {
+        const parts = line.trim().split(' ', 2);
+        if (parts.length < 2) continue;
+        const num = parseInt(parts[0], 10);
+        if (!isNaN(num) && num >= user_input_2 && num <= user_input_3) {
+          matchingLines.push(parts[1]);
+        }
+      }
+    }
+
+    output.push(matchingLines);
+    return output;
+
+  } catch (error) {
+    output.error = `Exception occurred: ${error.message}`;
+    return output;
+  }
+}
+
 function expandDashRanges(tupleOfLists, book) {
   const dashPattern = /[-–—]/; // hyphen, endash, emdash
   const result = [];
@@ -281,7 +358,22 @@ searchButton.addEventListener('click', () => {
     const standArrayId = enforceListLengths(arrayId);
     const expandedId = expandDashRanges(standArrayId, book);
 
-    results.push(`Book: ${book}, ID: ${expandedId}`);
+    for (const listee of id) {
+      if (parseInt(listee[0], 10) > lengthBook[book]) {
+        continue;
+      }
+    
+      if (listee.length === 1) {
+        results.push(`${book} ${listee[0]}`);
+      } else if (listee.length === 3) {
+        results.push(`${book} ${listee[0]} : ${listee[1]}-${listee[2]}`);
+      }
+    
+      const requestResult = await makeRequest(book, listee);
+      results.push(requestResult);
+    }
+
+    // results.push(`Book: ${book}, ID: ${expandedId}`);
   }
 
   confirmation.textContent = results.length > 0
