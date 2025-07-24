@@ -1,4 +1,3 @@
-const pasteButton = document.getElementById('pasteButton');
 const searchButton = document.getElementById('searchButton');
 const searchInput = document.getElementById('searchInput');
 const confirmation = document.getElementById('confirmation');
@@ -303,15 +302,6 @@ function enforceListLengths(tuplesOfLists) {
 
   return updatedLists; // JS has no tuple, return array of arrays
 }
-
-pasteButton.addEventListener('click', async () => {
-  try {
-    const text = await navigator.clipboard.readText();
-    searchInput.value = text;
-  } catch (err) {
-    alert('Failed to read clipboard: ' + err);
-  }
-});
 
 const lengthBook = {
   Ddd: 50,
