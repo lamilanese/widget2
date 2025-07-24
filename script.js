@@ -24,7 +24,7 @@ function expandDashRanges(tupleOfLists, book) {
           }
 
           let low = Math.min(start, end);
-          let high = Math.min(Math.max(start, end), length_book[book]);
+          let high = Math.min(Math.max(start, end), lengthBook[book]);
 
           for (let i = low; i <= high; i++) {
             result.push([String(i)]);
@@ -75,7 +75,7 @@ function expandDashRanges(tupleOfLists, book) {
           continue;
         }
         let low2 = Math.min(start2, end2);
-        let high2 = Math.min(Math.max(start2, end2), length_book[book]);
+        let high2 = Math.min(Math.max(start2, end2), lengthBook[book]);
         result.push([item1, low2, high2]);
 
       // Scenario 4: item1 with dash, item2 int
@@ -100,7 +100,7 @@ function expandDashRanges(tupleOfLists, book) {
           }
 
           let low = Math.min(start, end);
-          let high = Math.min(Math.max(start, end), length_book[book]);
+          let high = Math.min(Math.max(start, end), lengthBook[book]);
 
           for (let i = low; i < high; i++) {
             result.push([String(i)]);
