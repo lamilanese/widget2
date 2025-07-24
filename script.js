@@ -26,6 +26,7 @@ async function makeRequest(book, ref) {
 
   const url = `https://www.aelf.org/bible/${book}/${user_input_1}`;
   debug.push(`Fetching URL: ${url}`);
+  output.push(url);
 
   try {
     const response = await fetch(url);
