@@ -4,9 +4,14 @@ const confirmation = document.getElementById('confirmation');
 
 async function makeRequest(book, ref) {
   const output = []; // result object to store results
+  const debug = []; // debug log
+
+  debug.push(`Starting request: book=${book}, ref=${ref.join(', ')}`);
 
   if (ref.length !== 1 && ref.length !== 3) {
-    return output; // return empty if format is wrong
+    debug.push("❌ Invalid ref format, must be length 1 or 3.");
+    output.debug = debug;
+    return output;
   }
 
   const user_input_1 = ref[0];
@@ -16,22 +21,30 @@ async function makeRequest(book, ref) {
   if (!without_refs) {
     user_input_2 = parseInt(ref[1], 10);
     user_input_3 = parseInt(ref[2], 10);
+    debug.push(`Parsed range: ${user_input_2} to ${user_input_3}`);
   }
 
   const url = `https://www.aelf.org/bible/${book}/${user_input_1}`;
+  debug.push(`Fetching URL: ${url}`);
 
   try {
     const response = await fetch(url);
+
+    if (!response.ok) {
+      debug.push(`❌ HTTP error: ${response.status}`);
+      output.debug = debug;
+      return output;
+    }
+
     const json = await response.json();
     output.push(json);
-    if (!response.ok) {
-      return [];
-    }
+    debug.push("✅ Fetched and parsed JSON.");
 
     const html = await response.text();
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
     const text = doc.body.textContent || '';
+    debug.push(`Extracted ${text.length} characters from page.`);
 
     // Split and group lines
     const lines = text.split('\n');
@@ -51,7 +64,10 @@ async function makeRequest(book, ref) {
       sections.push(currentSection);
     }
 
+    debug.push(`Found ${sections.length} sections.`);
     const section = sections[sections.length - 2] || [];
+    debug.push(`Processing ${section.length} lines in selected section.`);
+
     const matchingLines = [];
 
     if (without_refs) {
@@ -60,6 +76,7 @@ async function makeRequest(book, ref) {
         if (parts.length < 2 || i === 0) continue;
         matchingLines.push(parts[1]);
       }
+      debug.push(`Extracted ${matchingLines.length} lines without refs.`);
     } else {
       for (const line of section) {
         const parts = line.trim().split(' ', 2);
@@ -69,13 +86,17 @@ async function makeRequest(book, ref) {
           matchingLines.push(parts[1]);
         }
       }
+      debug.push(`Matched ${matchingLines.length} lines with refs.`);
     }
 
     output.push(matchingLines);
+    output.debug = debug; // ✅ Add debug info to the output
     return output;
 
   } catch (error) {
-    return [];
+    debug.push(`❌ Exception occurred: ${error.message}`);
+    output.debug = debug;
+    return output;
   }
 }
 
