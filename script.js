@@ -3,6 +3,10 @@ const searchButton = document.getElementById('searchButton');
 const searchInput = document.getElementById('searchInput');
 const confirmation = document.getElementById('confirmation');
 
+function validateInput(input) {
+  return input.length > 0;
+}
+
 pasteButton.addEventListener('click', async () => {
   try {
     const text = await navigator.clipboard.readText();
@@ -14,7 +18,7 @@ pasteButton.addEventListener('click', async () => {
 
 searchButton.addEventListener('click', () => {
   const query = searchInput.value.trim();
-  if (query !== '') {
+  if (validateInput(query)) {
     confirmation.textContent = `Search confirmed: "${query}"`;
   } else {
     confirmation.textContent = '';
