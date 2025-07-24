@@ -22,6 +22,8 @@ async function makeRequest(book, ref) {
 
   try {
     const response = await fetch(url);
+    const json = await response.json();
+    output.push(json);
     if (!response.ok) {
       return [];
     }
