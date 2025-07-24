@@ -82,6 +82,31 @@ function splitTextToOrderedTuple(text) {
   return filtered; // JS has no tuple, so return array of arrays
 }
 
+function enforceListLengths(tuplesOfLists) {
+  const updatedLists = [];
+  let lastFirstElem = null;
+  let foundTwoLength = false;
+
+  for (const lst of tuplesOfLists) {
+    if (lst.length === 2) {
+      foundTwoLength = true;
+      lastFirstElem = lst[0];
+      updatedLists.push(lst);
+    } else if (lst.length === 1) {
+      if (foundTwoLength) {
+        // Prepend lastFirstElem
+        updatedLists.push([lastFirstElem, ...lst]);
+      } else {
+        updatedLists.push(lst);
+      }
+    } else {
+      throw new Error("Erreur de format");
+    }
+  }
+
+  return updatedLists; // JS has no tuple, return array of arrays
+}
+
 pasteButton.addEventListener('click', async () => {
   try {
     const text = await navigator.clipboard.readText();
@@ -131,8 +156,9 @@ searchButton.addEventListener('click', () => {
     const cleanedId = removeUnwantedPunctuation(idNoSpaces);
     const collapsedId = collapseAndWarnOnMixedPunctuation(cleanedId);
     const arrayId = splitTextToOrderedTuple(collapsedId);
+    const standArrayId = enforceListLengths(arrayId);
 
-    results.push(`Book: ${book}, ID: ${arrayId}`);
+    results.push(`Book: ${book}, ID: ${standArrayId}`);
   }
 
   confirmation.textContent = results.length > 0
