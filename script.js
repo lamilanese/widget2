@@ -311,7 +311,7 @@ const lengthBook = {
   // Add more books as needed
 };
 
-searchButton.addEventListener('click', () => {
+searchButton.addEventListener('click', async () => {
   const query = searchInput.value.trim();
 
   if (!validateInput(query)) {
