@@ -36,6 +36,39 @@ function countNumericSequences(s) {
   return matches ? matches.length : 0;
 }
 
+function collapseAndWarnOnMixedPunctuation(s) {
+  const result = [];
+  const punctuation = `!"#$%&'()*+,-./:;<=>?@[\\]^_\`{|}~`; // similar to string.punctuation in Python
+
+  let i = 0;
+  while (i < s.length) {
+    const char = s[i];
+    result.push(char);
+
+    if (punctuation.includes(char)) {
+      let j = i + 1;
+      const cluster = [];
+
+      while (j < s.length && punctuation.includes(s[j])) {
+        cluster.push(s[j]);
+        j++;
+      }
+
+      if (cluster.length > 0) {
+        // Warn if there's a difference in punctuation
+        if (cluster.some(c => c !== char)) {
+          console.warn(`Warning: mixed punctuation '${char + cluster.join('')}' at position ${i}`);
+        }
+      }
+      i = j; // Skip the rest of the cluster
+    } else {
+      i++;
+    }
+  }
+
+  return result.join('');
+}
+
 pasteButton.addEventListener('click', async () => {
   try {
     const text = await navigator.clipboard.readText();
@@ -83,8 +116,9 @@ searchButton.addEventListener('click', () => {
     }
 
     const cleanedId = removeUnwantedPunctuation(idNoSpaces);
+    const collapsedID = collapseAndWarnOnMixedPunctuation(cleanedId);
 
-    results.push(`Book: ${book}, ID: ${cleanedId}`);
+    results.push(`Book: ${book}, ID: ${collapsedID}`);
   }
 
   confirmation.textContent = results.length > 0
