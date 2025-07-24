@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search Widget</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f7fa;
+    }
+
+    .widget-container {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #ffffff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      padding: 12px 16px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .widget-container input[type="text"] {
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      font-size: 14px;
+      width: 200px;
+    }
+
+    .widget-container button {
+      padding: 8px 12px;
+      border: none;
+      background-color: #007bff;
+      color: #fff;
+      font-size: 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .widget-container button:hover {
+      background-color: #0056b3;
+    }
+
+    .confirmation-message {
+      text-align: center;
+      margin-top: 80px;
+      font-size: 16px;
+      color: #28a745;
+    }
+  </style>
+</head>
+<body>
+  <div class="widget-container">
+    <button id="pasteButton">📋</button>
+    <input type="text" id="searchInput" placeholder="Type or paste something..." />
+    <button id="searchButton">Search</button>
+  </div>
+  <div id="confirmation" class="confirmation-message"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
