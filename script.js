@@ -24,8 +24,7 @@ async function makeRequest(book, ref) {
   try {
     const response = await fetch(url);
     if (!response.ok) {
-      output.error = `Failed to retrieve content. Status code: ${response.status}`;
-      return output;
+      return [];
     }
 
     const html = await response.text();
@@ -75,8 +74,7 @@ async function makeRequest(book, ref) {
     return output;
 
   } catch (error) {
-    output.error = `Exception occurred: ${error.message}`;
-    return output;
+    return [];
   }
 }
 
