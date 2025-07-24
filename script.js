@@ -35,12 +35,9 @@ async function makeRequest(book, ref) {
       output.debug = debug;
       return output;
     }
-
-    const json = await response.json();
-    output.push(json);
-    debug.push("✅ Fetched and parsed JSON.");
-
     const html = await response.text();
+    output.push(html);
+    debug.push("✅ Fetched and parsed HTML.");
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
     const text = doc.body.textContent || '';
