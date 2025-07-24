@@ -69,6 +69,19 @@ function collapseAndWarnOnMixedPunctuation(s) {
   return result.join('');
 }
 
+function splitTextToOrderedTuple(text) {
+  // Split on one or more semicolons or commas
+  const parts = text.split(/[;,]+/);
+
+  // For each non-empty trimmed part, split again on one or more colons or commas
+  const filtered = parts
+    .map(part => part.trim())
+    .filter(part => part.length > 0)
+    .map(part => part.split(/[:,]+/));
+
+  return filtered; // JS has no tuple, so return array of arrays
+}
+
 pasteButton.addEventListener('click', async () => {
   try {
     const text = await navigator.clipboard.readText();
@@ -116,9 +129,10 @@ searchButton.addEventListener('click', () => {
     }
 
     const cleanedId = removeUnwantedPunctuation(idNoSpaces);
-    const collapsedID = collapseAndWarnOnMixedPunctuation(cleanedId);
+    const collapsedId = collapseAndWarnOnMixedPunctuation(cleanedId);
+    const arrayId = splitTextToOrderedTuple(collapsedId);
 
-    results.push(`Book: ${book}, ID: ${collapsedID}`);
+    results.push(`Book: ${book}, ID: ${arrayId}`);
   }
 
   confirmation.textContent = results.length > 0
