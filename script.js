@@ -3,6 +3,128 @@ const searchButton = document.getElementById('searchButton');
 const searchInput = document.getElementById('searchInput');
 const confirmation = document.getElementById('confirmation');
 
+function expandDashRanges(tupleOfLists, book) {
+  const dashPattern = /[-–—]/; // hyphen, endash, emdash
+  const result = [];
+
+  for (const lst of tupleOfLists) {
+    if (lst.length === 1) {
+      const item = lst[0];
+      if (dashPattern.test(item)) {
+        const parts = item.split(dashPattern);
+        if (parts.length === 2) {
+          let start, end;
+          try {
+            start = parseInt(parts[0].trim(), 10);
+            end = parseInt(parts[1].trim(), 10);
+            if (isNaN(start) || isNaN(end)) throw new Error();
+          } catch {
+            result.push(lst);
+            continue;
+          }
+
+          let low = Math.min(start, end);
+          let high = Math.min(Math.max(start, end), length_book[book]);
+
+          for (let i = low; i <= high; i++) {
+            result.push([String(i)]);
+          }
+        } else {
+          result.push(lst);
+        }
+      } else {
+        result.push(lst);
+      }
+
+    } else if (lst.length === 2) {
+      const [item1, item2] = lst;
+      const item1HasDash = dashPattern.test(item1);
+      const item2HasDash = dashPattern.test(item2);
+
+      // Scenario 3: both have dash → error, return empty array immediately
+      if (item1HasDash && item2HasDash) {
+        return [];
+      }
+
+      // Scenario 1: both ints
+      if (!item1HasDash && !item2HasDash) {
+        try {
+          if (isNaN(parseInt(item1, 10)) || isNaN(parseInt(item2, 10))) throw new Error();
+          // Add third item same as item2
+          result.push([item1, item2, item2]);
+        } catch {
+          // Not ints, keep empty array
+          result.push([]);
+        }
+
+      // Scenario 2: item1 int, item2 with dash
+      } else if (!item1HasDash && item2HasDash) {
+        let start2, end2;
+        try {
+          if (isNaN(parseInt(item1, 10))) throw new Error();
+          const parts = item2.split(dashPattern);
+          if (parts.length !== 2) {
+            result.push([]);
+            continue;
+          }
+          start2 = parseInt(parts[0].trim(), 10);
+          end2 = parseInt(parts[1].trim(), 10);
+          if (isNaN(start2) || isNaN(end2)) throw new Error();
+        } catch {
+          result.push([]);
+          continue;
+        }
+        let low2 = Math.min(start2, end2);
+        let high2 = Math.min(Math.max(start2, end2), length_book[book]);
+        result.push([item1, low2, high2]);
+
+      // Scenario 4: item1 with dash, item2 int
+      } else if (item1HasDash && !item2HasDash) {
+        try {
+          if (isNaN(parseInt(item2, 10))) throw new Error();
+        } catch {
+          result.push([]);
+          continue;
+        }
+
+        const parts = item1.split(dashPattern);
+        if (parts.length === 2) {
+          let start, end;
+          try {
+            start = parseInt(parts[0].trim(), 10);
+            end = parseInt(parts[1].trim(), 10);
+            if (isNaN(start) || isNaN(end)) throw new Error();
+          } catch {
+            result.push([]);
+            continue;
+          }
+
+          let low = Math.min(start, end);
+          let high = Math.min(Math.max(start, end), length_book[book]);
+
+          for (let i = low; i < high; i++) {
+            result.push([String(i)]);
+          }
+          result.push([String(high), '1', item2]);
+        } else {
+          result.push(lst);
+        }
+
+      } else {
+        // fallback, keep as is
+        result.push(lst);
+      }
+    } else {
+      throw new Error("Each list must have length 1 or 2.");
+    }
+  }
+
+  // Filter out empty lists (like [])
+  return result.filter(lst => lst.length > 0);
+}
+
+
+
 function validateInput(input) {
   return input.length > 0;
 }
@@ -157,8 +279,9 @@ searchButton.addEventListener('click', () => {
     const collapsedId = collapseAndWarnOnMixedPunctuation(cleanedId);
     const arrayId = splitTextToOrderedTuple(collapsedId);
     const standArrayId = enforceListLengths(arrayId);
+    const expandedId = expandDashRanges(standArrayId, book);
 
-    results.push(`Book: ${book}, ID: ${standArrayId}`);
+    results.push(`Book: ${book}, ID: ${expandedId}`);
   }
 
   confirmation.textContent = results.length > 0
