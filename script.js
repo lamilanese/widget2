@@ -50,7 +50,7 @@ const lengthBook = {
 };
 searchButton.addEventListener('click', () => {
   const query = searchInput.value.trim();
-  const ids = extractIds(input);
+  const ids = extractIds(query);
 
   for (let rawId of ids) {
     let id = truncateToLastDigit(rawId);
