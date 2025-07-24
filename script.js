@@ -358,7 +358,7 @@ searchButton.addEventListener('click', () => {
     const standArrayId = enforceListLengths(arrayId);
     const expandedId = expandDashRanges(standArrayId, book);
 
-    for (const listee of id) {
+    for (const listee of expandedId) {
       if (parseInt(listee[0], 10) > lengthBook[book]) {
         continue;
       }
