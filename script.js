@@ -28,6 +28,9 @@ async function makeRequest(book, ref) {
   debug.push(`Fetching URL: ${url}`);
   output.push(url);
 
+  const response = await fetch(url);
+  output.push(response);
+
   try {
     const response = await fetch(url);
      if (response.ok) {
