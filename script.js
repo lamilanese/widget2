@@ -24,12 +24,12 @@ async function makeRequest(book, ref) {
     debug.push(`Parsed range: ${user_input_2} to ${user_input_3}`);
   }
 
-  const url = `https://www.aelf.org/bible/${book}/${user_input_1}`;
+  const url = `https://cors-anywhere.herokuapp.com/https://www.aelf.org/bible/${book}/${user_input_1}`;
   debug.push(`Fetching URL: ${url}`);
   output.push(url);
 
-  const response = await fetch(url);
-  output.push(response);
+  // const response = await fetch(url);
+  // output.push(response);
 
   try {
     const response = await fetch(url);
