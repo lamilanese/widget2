@@ -30,9 +30,12 @@ async function makeRequest(book, ref) {
 
   try {
     const response = await fetch(url);
-
+     if (response.ok) {
+        output.push(`response: ${response.status}`);
+        return output;
+      }
     if (!response.ok) {
-      debug.push(`❌ HTTP error: ${response.status}`);
+      output.push(`❌ HTTP error: ${response.status}`);
       output.debug = debug;
       return output;
     }
