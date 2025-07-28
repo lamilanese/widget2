@@ -32,7 +32,12 @@ async function makeRequest(book, ref) {
   // output.push(response);
 
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, {
+  method: 'GET',
+  headers: {
+    'Accept': 'application/json',
+  },
+}));
      if (response.ok) {
         output.push(`response: ${response.status}`);
         return output;
